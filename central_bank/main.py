@@ -1,4 +1,5 @@
 import sys
+import time
 from decimal import Decimal
 from central_bank.engine import BANK
 from central_bank.cli import Cli
@@ -25,13 +26,13 @@ def user_online(name: str) -> bool:
     return len(m.players(name=f"^{re.escape(name)}$")) > 0
 
 
+def unix_days() -> Decimal:
+    return Decimal(time.time_ns()) / Decimal(86_400_000_000_000)
+
+
 def main():
     file = sys.argv[1] if len(sys.argv) > 1 else ":memory:"
-    cli = Cli(
-        file,
-        lambda: Decimal(m.world_info().game_ticks) / 72000,
-        user_online,
-    )
+    cli = Cli(file, unix_days, user_online)
     is_central_on = False
     m.chat(f"Bank is running using {file}. Type $help.")
 
